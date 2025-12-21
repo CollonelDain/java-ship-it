@@ -1,7 +1,5 @@
 package ru.yandex.practicum.delivery;
 
-import org.w3c.dom.ls.LSOutput;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -11,6 +9,9 @@ public class DeliveryApp {
     private static final Scanner scanner = new Scanner(System.in);
     private static List<Parcel> allParcels = new ArrayList<>();
     private static List<Trackable> parcelsWithTracking = new ArrayList<>();
+    private static ParcelBox<StandardParcel> boxStandart = new ParcelBox<>(15);
+    private static ParcelBox<FragileParcel> boxFragile = new ParcelBox<>(10);
+    private static ParcelBox<PerishableParcel> boxPerishable = new ParcelBox<>(5);
 
     public static void main(String[] args) {
         boolean running = true;
@@ -31,6 +32,9 @@ public class DeliveryApp {
                 case 4:
                     setNewReportStatus();
                     break;
+                case 5:
+                    showContentsOfBox();
+                    break;
                 case 0:
                     running = false;
                     break;
@@ -46,6 +50,7 @@ public class DeliveryApp {
         System.out.println("2 — Отправить все посылки");
         System.out.println("3 — Посчитать стоимость доставки");
         System.out.println("4 — Задать новую локацию для посылок");
+        System.out.println("5 — Показать содержимое коробки");
         System.out.println("0 — Завершить");
     }
 
@@ -89,10 +94,12 @@ public class DeliveryApp {
         switch (choice) {
             case 1:
                 parcel = new StandardParcel(description, weight, deliveryAddress, sendDay);
+                boxStandart.addParcels((StandardParcel) parcel);
                 break;
             case 2:
                 parcel = new FragileParcel(description, weight, deliveryAddress, sendDay);
                 parcelsWithTracking.add((Trackable) parcel);
+                boxFragile.addParcels((FragileParcel) parcel);
                 break;
             case 3:
                 int timeToLive;
@@ -105,6 +112,7 @@ public class DeliveryApp {
                     return;
                 }
                 parcel = new PerishableParcel(description, weight, deliveryAddress, sendDay, timeToLive);
+                boxPerishable.addParcels((PerishableParcel) parcel);
                 break;
             default:
                 System.out.println("Неверный выбор типа посылки!\n");
@@ -112,7 +120,7 @@ public class DeliveryApp {
         }
 
         allParcels.add(parcel);
-        System.out.println("Посылка успешно добавлена!\n");
+        System.out.println("Посылка успешно принята для доставки.\n");
     }
 
     private static void sendParcels() {
@@ -143,6 +151,30 @@ public class DeliveryApp {
         }
 
         System.out.println("Статус всех посылок обновлен.\n");
+    }
+
+    private static void showContentsOfBox() {
+        System.out.println("Выберите тип коробки:");
+        System.out.println("1 — Стандарт");
+        System.out.println("2 — Хрупкая");
+        System.out.println("3 — Скоропортящаяся");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                boxStandart.printContents();
+                break;
+            case 2:
+                boxFragile.printContents();
+                break;
+            case 3:
+                boxPerishable.printContents();
+                break;
+            default:
+                System.out.println("Неверный выбор типа коробки!\n");
+        }
     }
 }
 
