@@ -10,7 +10,7 @@ public class DeliveryApp {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static List<Parcel> allParcels = new ArrayList<>();
-    private static List<Parcel> parcelsWithTracking = new ArrayList<>();
+    private static List<Trackable> parcelsWithTracking = new ArrayList<>();
 
     public static void main(String[] args) {
         boolean running = true;
@@ -27,6 +27,9 @@ public class DeliveryApp {
                     break;
                 case 3:
                     calculateCosts();
+                    break;
+                case 4:
+                    setNewReportStatus();
                     break;
                 case 0:
                     running = false;
@@ -89,7 +92,7 @@ public class DeliveryApp {
                 break;
             case 2:
                 parcel = new FragileParcel(description, weight, deliveryAddress, sendDay);
-                parcelsWithTracking.add(parcel);
+                parcelsWithTracking.add((Trackable) parcel);
                 break;
             case 3:
                 int timeToLive;
@@ -128,5 +131,18 @@ public class DeliveryApp {
         System.out.printf("Общая сумма доставки <<%s>> рублей\n\n", costs);
     }
 
+    private static void setNewReportStatus() {
+        if (parcelsWithTracking.isEmpty()) {
+            System.out.println("Нет посылок, поддерживающих трекинг.");
+            return;
+        }
+
+        for (Trackable parcel : parcelsWithTracking) {
+            System.out.printf("Введите текущее местоположение посылки <<%s>>: \n", ((Parcel) parcel).getDescription());
+            ((FragileParcel) parcel).reportStatus(scanner.nextLine());
+        }
+
+        System.out.println("Статус всех посылок обновлен.\n");
+    }
 }
 
