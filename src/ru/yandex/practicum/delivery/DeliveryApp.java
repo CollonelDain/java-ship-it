@@ -1,5 +1,7 @@
 package ru.yandex.practicum.delivery;
 
+import org.w3c.dom.ls.LSOutput;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -8,6 +10,7 @@ public class DeliveryApp {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static List<Parcel> allParcels = new ArrayList<>();
+    private static List<Parcel> parcelsWithTracking = new ArrayList<>();
 
     public static void main(String[] args) {
         boolean running = true;
@@ -29,7 +32,7 @@ public class DeliveryApp {
                     running = false;
                     break;
                 default:
-                    System.out.println("Неверный выбор.");
+                    System.out.println("Неверный выбор.\n");
             }
         }
     }
@@ -39,21 +42,90 @@ public class DeliveryApp {
         System.out.println("1 — Добавить посылку");
         System.out.println("2 — Отправить все посылки");
         System.out.println("3 — Посчитать стоимость доставки");
+        System.out.println("4 — Задать новую локацию для посылок");
         System.out.println("0 — Завершить");
     }
 
-    // реализуйте методы ниже
-
     private static void addParcel() {
-        // Подсказка: спросите тип посылки и необходимые поля, создайте объект и добавьте в allParcels
+        System.out.println("Выберите тип посылки:");
+        System.out.println("1 — Стандарт");
+        System.out.println("2 — Хрупкая");
+        System.out.println("3 — Скоропортящаяся");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        String description;
+        int weight;
+        String deliveryAddress;
+        byte sendDay;
+        try {
+            System.out.print("Введите описание посылки: ");
+            description = scanner.nextLine();
+
+            System.out.print("Введите вес посылки (целое число): ");
+            weight = Integer.parseInt(scanner.nextLine());
+
+            System.out.print("Введите адрес доставки: ");
+            deliveryAddress = scanner.nextLine();
+
+            System.out.print("Введите день отправки: ");
+            sendDay = Byte.parseByte(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Некорректный ввод числа!\n");
+            System.out.println(e.getMessage());
+            return;
+        } catch (Exception e) {
+            System.out.println("Непредвиденная ошибка!\n");
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        Parcel parcel;
+
+        switch (choice) {
+            case 1:
+                parcel = new StandardParcel(description, weight, deliveryAddress, sendDay);
+                break;
+            case 2:
+                parcel = new FragileParcel(description, weight, deliveryAddress, sendDay);
+                parcelsWithTracking.add(parcel);
+                break;
+            case 3:
+                int timeToLive;
+                try {
+                    System.out.print("Введите срок годности (в днях): ");
+                    timeToLive = Integer.parseInt(scanner.nextLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Некорректный ввод числа!\n");
+                    System.out.println(e.getMessage());
+                    return;
+                }
+                parcel = new PerishableParcel(description, weight, deliveryAddress, sendDay, timeToLive);
+                break;
+            default:
+                System.out.println("Неверный выбор типа посылки!\n");
+                return;
+        }
+
+        allParcels.add(parcel);
+        System.out.println("Посылка успешно добавлена!\n");
     }
 
     private static void sendParcels() {
-        // Пройти по allParcels, вызвать packageItem() и deliver()
+        for (Parcel parcel : allParcels) {
+            parcel.packageItem();
+            parcel.deliver();
+        }
     }
 
     private static void calculateCosts() {
-        // Посчитать общую стоимость всех доставок и вывести на экран
+        int costs = 0;
+        for (Parcel parcel : allParcels) {
+            costs += parcel.calculateDeliveryCost();
+        }
+
+        System.out.printf("Общая сумма доставки <<%s>> рублей\n\n", costs);
     }
 
 }
