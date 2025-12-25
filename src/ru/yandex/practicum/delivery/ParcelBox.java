@@ -5,19 +5,22 @@ import java.util.ArrayList;
 public class ParcelBox<T extends Parcel> {
     private ArrayList<T> parcels;
     private int maxWeight;
+    private int currentWeight;
 
     public ParcelBox(int maxWeight) {
         this.maxWeight = maxWeight;
         this.parcels = new ArrayList<>();
+        this.currentWeight = 0;
     }
 
     public boolean addParcels(T parcel) {
-        if (parcel.getWeight() > maxWeight) {
-            System.out.println("Посылка слишком тяжелая для этой коробки!\n");
+        if (this.currentWeight + parcel.getWeight() > maxWeight) {
+            System.out.println("Посылка не помещается в эту коробку!\n");
             return false;
         }
 
         parcels.add(parcel);
+        this.currentWeight += parcel.getWeight();
         System.out.println("Посылка добавлена в коробку.\n");
         return true;
     }
