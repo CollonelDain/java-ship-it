@@ -14,8 +14,8 @@ public class FragileParcel extends Parcel implements Trackable {
     }
 
     @Override
-    public int calculateDeliveryCost() {
-        return BASE_COST * getWeight();
+    public int getBaseCost() {
+        return BASE_COST;
     }
 
     @Override
